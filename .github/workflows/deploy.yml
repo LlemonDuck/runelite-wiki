@@ -1,0 +1,22 @@
+on:
+  push:
+    branches: [master]
+
+jobs: 
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: Deploy to Wiki
+        run: |
+          git config --unset-all http.https://github.com/.extraheader
+          git config user.name LlemonDuck
+          git config user.email napkinorton@gmail.com
+          git remote add downstream-wiki https://${{secrets.DEPLOY_PAT}}@github.com/LlemonDuck/runelite.wiki.git
+          git fetch downstream-wiki
+          echo "$(git rev-parse downstream-wiki/master) -> $(git rev-parse HEAD)"
+          git push downstream-wiki $(git rev-parse HEAD):master
